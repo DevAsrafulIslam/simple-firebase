@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  GithubAuthProvider,
   GoogleAuthProvider,
   getAuth,
   signInWithPopup,
@@ -9,10 +10,25 @@ import app from "../../firebase/firebase.init";
 const Login = () => {
   const [user, setUser] = useState(null);
   const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
+  const googleProvider = new GoogleAuthProvider();
+  const githubProvider = new GithubAuthProvider();
+
+  // google login
 
   const signInWithGoogle = () => {
-    signInWithPopup(auth, provider)
+    signInWithPopup(auth, googleProvider)
+      .then((result) => {
+        const logedInUser = result.user;
+        console.log(logedInUser);
+        setUser(logedInUser);
+      })
+      .catch((error) => {
+        console.log("error", error.message);
+      });
+  };
+  // github
+  const githubSignIn = () => {
+    signInWithPopup(auth, githubProvider)
       .then((result) => {
         const logedInUser = result.user;
         console.log(logedInUser);
@@ -23,6 +39,7 @@ const Login = () => {
       });
   };
 
+  // google signOut
   const signOutGoogle = () => {
     signOut(auth)
       .then(() => {
@@ -35,9 +52,16 @@ const Login = () => {
   return (
     <div>
       {user ? (
-        <button className="my-4" onClick={signOutGoogle}>Sign out</button>
+        <button className="my-4" onClick={signOutGoogle}>
+          Sign out
+        </button>
       ) : (
-        <button className="my-4" onClick={signInWithGoogle}>Google Login</button>
+        <div className="flex gap-2 items-center justify-center">
+          <button className="my-4" onClick={signInWithGoogle}>
+            Google Login
+          </button>
+          <button onClick={githubSignIn}>Github Login</button>
+        </div>
       )}
       {user && (
         <div className="border border-[goldenrod] py-4">
